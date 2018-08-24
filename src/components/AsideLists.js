@@ -30,10 +30,10 @@ class AsideLists extends Component {
   render () {
     return (
       <aside className="location-list">
-        <input type="text"
+        <input type="text" className="location-list-input"
                value={this.state.searchValue}
                onChange={this.funcFilterLocation}/>
-        <ul>
+        <ul className="location-list-items">
           {
             this.state.filterlocations
               .map((loc) => {
