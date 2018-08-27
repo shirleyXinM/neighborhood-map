@@ -90,6 +90,7 @@ class App extends Component {
     this.closeInfoWindow = this.closeInfoWindow.bind(this);
     this.showMarkerInfoWindow = this.showMarkerInfoWindow.bind(this);
     this.getMarkerInfo = this.getMarkerInfo.bind(this);
+    this.setMapCenter = this.setMapCenter.bind(this);
     // this.handleSetMarker = this.handleSetMarker.bind(this);
   }
 
@@ -131,11 +132,7 @@ class App extends Component {
       location.infoWindow = infoWindow;
 
       window.AMap.event.addListener(marker, 'click', function () {
-        let pos = marker.getPosition();
-        let position = new window.AMap.LngLat(pos.lng,pos.lat);  // 标准写法
-        console.log(position);
-        self.state.map.setCenter(position);
-        console.log('center',self.state.map.getCenter())
+        self.setMapCenter(marker);
         infoWindow.open(self.state.map, marker.getPosition());
       });
 
@@ -145,6 +142,12 @@ class App extends Component {
     this.setState({
       locationList: alllocations
     })
+  }
+
+  setMapCenter(marker){
+    let pos = marker.getPosition();
+    let position = new window.AMap.LngLat(pos.lng,pos.lat);  // 标准写法
+    this.state.map.setCenter(position);
   }
 
   createInfoWindow (marker, title, content) {
@@ -202,7 +205,7 @@ class App extends Component {
 
   showMarkerInfoWindow (loc) {
     let index = this.state.locationList.indexOf(loc);
-    console.log(loc,index)
+    this.setMapCenter(loc.marker);
     loc.infoWindow.open(this.state.map, loc.marker.getPosition());
   }
 
