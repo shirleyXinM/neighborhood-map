@@ -13,6 +13,7 @@ class AsideLists extends Component {
     this.handleVisibleSearch = this.handleVisibleSearch.bind(this);
     this.showMarkerWindow = this.showMarkerWindow.bind(this);
     this.handleShowLists = this.handleShowLists.bind(this);
+    this.handleItemKeyup = this.handleItemKeyup.bind(this);
   }
 
   handleVisibleSearch (e) {
@@ -20,7 +21,11 @@ class AsideLists extends Component {
       show: !this.state.show
     })
   }
-
+  handleItemKeyup(e,loc) {
+    if(e.keyCode == 13){
+      this.props.showMarkerWindow(loc);
+    }
+  }
   handleShowLists () {
     this.setState({
       showLists: !this.state.showLists
@@ -66,24 +71,33 @@ class AsideLists extends Component {
              onClick={this.handleShowLists}>&#xe62b;</div>
         <div className="location-list-content" style={listStyle}>
           <input type="text"
+                 role="search"
+                 aria-label="filter"
+                 placeholder="Filter"
                  className="location-list-input"
                  value={this.state.searchValue}
+                 tabIndex={this.state.filterlocations.length+2}
                  onChange={this.funcFilterLocation}/>
           <ul className="location-list-items"
               style={ulStyle}>
             {
               this.state.filterlocations
-                .map((loc) => {
+                .map((loc,index) => {
                   return (
                     <li key={loc.name}
+                        role="button"
+                        tabindex={index+1}
                         className="location-list-item"
-                        onClick={(e) => this.showMarkerWindow(e, loc)}>{loc.name}</li>
+                        onClick={(e) => this.showMarkerWindow(e, loc)} onKeyPress={(e)=>this.showMarkerWindow(e,loc)}>{loc.name}</li>
                   )
                 })
             }
           </ul>
           <a className="show-btn"
-             onClick={this.handleVisibleSearch}>{this.state.show ? "隐藏" : "显示"}搜索</a>
+             role="button"
+             tabIndex={this.state.filterlocations.length+1}
+             onClick={this.handleVisibleSearch}
+             onKeyPress={this.handleVisibleSearch}>{this.state.show ? "隐藏" : "显示"}搜索</a>
         </div>
       </aside>
     )

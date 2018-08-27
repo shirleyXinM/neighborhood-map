@@ -7,5 +7,10 @@
   列表中的数据是根据输入框来进行的内容来对所有的location进行过滤
 * App  
   对高德地图进行初始化，我们放在了componentDidMount()钩子中  
+  
+## 使用
+* 安装所需包:npm install
+* 运行开发模式: npm run start
+* 生成生产环境文件: npm run build
 
 
