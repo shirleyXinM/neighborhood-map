@@ -48,6 +48,7 @@ class AsideLists extends Component {
       searchValue: value,
       filterlocations: locations
     })
+    this.props.clearMarkerWindow();
   }
 
   componentWillMount () {

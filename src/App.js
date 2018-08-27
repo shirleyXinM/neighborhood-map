@@ -120,12 +120,12 @@ class App extends Component {
 
       // 设置marker点击事件
       let content = [];
-      content.push(`<p>类型: ${location.type}</p>`)
-      content.push(`<p>地址: ${location.streetAddress}</p>`)
+      // content.push(`<p>类型: ${location.type}</p>`)
+      // content.push(`<p>地址: ${location.streetAddress}</p>`)
 
       let infoWindow = new window.AMap.InfoWindow({
         isCustom: true,  //使用自定义窗体
-        content: this.createInfoWindow(marker,location.name, content.join("")),
+        content: this.createInfoWindow(marker, location.name, content.join("")),
         offset: new window.AMap.Pixel(16, -45)
       });
 
@@ -133,7 +133,11 @@ class App extends Component {
 
       window.AMap.event.addListener(marker, 'click', function () {
         self.setMapCenter(marker);
-        infoWindow.open(self.state.map, marker.getPosition());
+        //infoWindow.open(self.state.map, marker.getPosition());
+        self.setState({
+          infoWindow: infoWindow
+        })
+        self.getMarkerInfo(location.name, marker)
       });
 
       alllocations.push(location);
@@ -144,9 +148,9 @@ class App extends Component {
     })
   }
 
-  setMapCenter(marker){
+  setMapCenter (marker) {
     let pos = marker.getPosition();
-    let position = new window.AMap.LngLat(pos.lng,pos.lat);  // 标准写法
+    let position = new window.AMap.LngLat(pos.lng, pos.lat);  // 标准写法
     this.state.map.setCenter(position);
   }
 
@@ -205,8 +209,12 @@ class App extends Component {
 
   showMarkerInfoWindow (loc) {
     let index = this.state.locationList.indexOf(loc);
+    this.setState({
+      infoWindow: loc.infoWindow
+    })
     this.setMapCenter(loc.marker);
-    loc.infoWindow.open(this.state.map, loc.marker.getPosition());
+    this.getMarkerInfo(loc.name, loc.marker);
+    //this.state.infoWindow.open(this.state.map, loc.marker.getPosition());
   }
 
   handleSearchChange (val) {
@@ -221,33 +229,38 @@ class App extends Component {
     addMapScript("https://webapi.amap.com/maps?v=1.4.8&key=0b090011d74899419909ebb28322486e&callback=initMap");
   }
 
-  getMarkerInfo(marker) {
+  getMarkerInfo (title, marker) {
     var self = this;
     var clientId = "TPIDDHBKB2QFBWEV2MPDOFGUSWXCXGAA5IVOWEMN5ASR3UJW";
     var clientSecret = "4HB1ZZJBVXC3F0BREBPSGXYK0VZ5ALS4XRNJZSBP1JROG0DE";
-    var url = "https://api.foursquare.com/v2/venues/search?client_id=" + clientId + "&client_secret=" + clientSecret + "&v=20130815&ll=" + marker.getPosition().lat() + "," + marker.getPosition().lng() + "&limit=1";
+    var url = "https://api.foursquare.com/v2/venues/search?client_id=" + clientId + "&client_secret=" + clientSecret + "&v=20130815&ll=" + marker.getPosition().lat + "," + marker.getPosition().lng + "&limit=1";
     fetch(url)
       .then(
         function (response) {
           if (response.status !== 200) {
-            self.state.infowindow.setContent("Sorry data can't be loaded");
+            self.state.infoWindow.setContent(self.createInfoWindow(marker, title, "抱歉，数据加载失败"));
+            self.state.infoWindow.open(self.state.map, marker.getPosition());
             return;
           }
 
           // Examine the text in the response
           response.json().then(function (data) {
-            var location_data = data.response.venues[0];
-            var verified = '<b>Verified Location: </b>' + (location_data.verified ? 'Yes' : 'No') + '<br>';
-            var checkinsCount = '<b>Number of CheckIn: </b>' + location_data.stats.checkinsCount + '<br>';
-            var usersCount = '<b>Number of Users: </b>' + location_data.stats.usersCount + '<br>';
-            var tipCount = '<b>Number of Tips: </b>' + location_data.stats.tipCount + '<br>';
-            var readMore = '<a href="https://foursquare.com/v/'+ location_data.id +'" target="_blank">Read More on Foursquare Website</a>'
-            self.state.infowindow.setContent(checkinsCount + usersCount + tipCount + verified + readMore);
+            let location_data = data.response.venues[0];
+            let country = location_data.location.country;
+            let city = location_data.location.city ? location_data.location.city : '';
+            let street = location_data.location.address ? location_data.location.address : '';
+            //self.state.infoWindow.setContent(`<p>地址：${contry} ${city} ${street} </p>`);
+            self.state.infoWindow.setContent(self.createInfoWindow(marker, title, `<p>地址：${country} ${city} ${street} </p>`));
+            self.setState({
+              infoWindow: self.state.infoWindow
+            })
+            self.state.infoWindow.open(self.state.map, marker.getPosition());
           });
         }
       )
       .catch(function (err) {
-        self.state.infowindow.setContent("Sorry data can't be loaded");
+        self.state.infoWindow.setContent(self.createInfoWindow(marker, title, "抱歉，数据加载失败"));
+        self.state.infoWindow.open(self.state.map, marker.getPosition());
       });
   }
 
@@ -256,7 +269,8 @@ class App extends Component {
       <div className="App">
         <AsideLists alllocations={this.state.locationList}
                     setMarker={this.setMarker}
-                    showMarkerWindow={this.showMarkerInfoWindow}/>
+                    showMarkerWindow={this.showMarkerInfoWindow}
+                    clearMarkerWindow={this.closeInfoWindow}/>
         <div id="map-container"></div>
       </div>
     );
