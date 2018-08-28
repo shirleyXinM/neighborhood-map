@@ -86,7 +86,7 @@ class AsideLists extends Component {
                   return (
                     <li key={loc.name}
                         role="button"
-                        tabindex={index+1}
+                        tabIndex={index+1}
                         className="location-list-item"
                         onClick={(e) => this.showMarkerWindow(e, loc)} onKeyPress={(e)=>this.showMarkerWindow(e,loc)}>{loc.name}</li>
                   )
