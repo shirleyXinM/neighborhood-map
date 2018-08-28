@@ -22,7 +22,7 @@ class AsideLists extends Component {
     })
   }
   handleItemKeyup(e,loc) {
-    if(e.keyCode == 13){
+    if(e.keyCode === 13){
       this.props.showMarkerWindow(loc);
     }
   }

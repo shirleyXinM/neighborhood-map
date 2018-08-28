@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 //import component
@@ -138,7 +137,6 @@ class App extends Component {
   }
 
   showMarkerInfoWindow (loc) {
-    let index = this.state.locationList.indexOf(loc);
     this.setState({
       infoWindow: loc.infoWindow
     })
